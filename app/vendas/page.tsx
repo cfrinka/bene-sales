@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getProducts, processSale } from '@/lib/db';
 import { Product } from '@/types';
 import Image from 'next/image';
@@ -13,6 +13,7 @@ export default function VendasPage() {
   const [loading, setLoading] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const detailsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadProducts();
@@ -35,6 +36,13 @@ export default function VendasPage() {
     setSelectedProduct(product);
     setSelectedSizes({});
     setMessage(null);
+    
+    // Scroll to details on mobile
+    if (detailsRef.current && window.innerWidth < 1024) {
+      setTimeout(() => {
+        detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
   }
 
   function handleSizeToggle(size: string) {
@@ -202,7 +210,7 @@ export default function VendasPage() {
           </div>
 
           {/* Sale Form */}
-          <div>
+          <div ref={detailsRef}>
             <h2 className="text-xl font-semibold mb-4">Detalhes da Venda</h2>
             <div className="bg-white p-6 rounded-lg border border-gray-200">
               {selectedProduct ? (
